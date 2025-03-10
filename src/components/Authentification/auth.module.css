@@ -1,0 +1,113 @@
+.auth_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    height: max-content;
+    background: url('/ror2-mercenary-ty-davies.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+.auth_container {
+    background: linear-gradient(rgb(0, 0, 0), rgba(73, 73, 73, 0.582));
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    backdrop-filter: blur(10px) saturate(180%);
+    font-family: 'Roboto', sans-serif;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+
+
+.discord_button {
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    border: none;
+    background: rgb(0, 0, 0);
+    color: white;
+}
+
+.discord_button::after{
+    content : " ";
+    position: absolute;
+    background-color: white;
+    width: 102%;
+    height: 107%;
+    border-radius: 5px;
+    z-index: -1;
+    background-image: linear-gradient(to bottom right, #a2f1ff 0%, #5865f2 100%);
+}
+
+.discord_button:hover {
+   
+    box-shadow: 0 0 100px linear-gradient(to bottom right, #ffffff 0%, #ff0000 100%);
+}
+
+.separator {
+    content:"test";
+    border-bottom: 1px solid white;
+    width: 25%;
+    margin: 20px 0;
+
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.form_input {
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background: rgba(7, 7, 7, 0.8);
+}
+
+.form_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0;
+    gap: 10px;
+    padding: 15px;
+    border-radius: 5px;
+    border: none;
+    background: rgb(0, 0, 0);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: 0.3s;
+    position: relative;
+    text-decoration: none;
+    
+}
+
+.form_button::after{
+    content : " ";
+    position: absolute;
+    border-radius: 5px;
+    width: 101%;
+    height: 105%;
+    z-index: -1;  
+    background-image: linear-gradient(to bottom right, #e1b8fd 0%, #5865f2 100%);  
+}

@@ -1,0 +1,113 @@
+body {
+  min-height: 100vh;
+  width: 100%;
+  height: 100%;
+  overflow-y: hidden;
+  overflow: hidden;
+  margin: 0;
+  padding:0;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  height: max-content;
+  background: black; 
+}
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  height: 100%;
+  /*   font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+
+    font-size: 16px;
+    line-height: 24px;
+  font-weight: 400; */
+}
+
+
+
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color: #f6f6f6;
+    background: rgb(78, 78, 78)
+    /* background: -moz-linear-gradient(
+      159deg,
+      rgba(2, 0, 0, 1) 40%,
+      rgba(51, 10, 70, 1) 69%,
+      rgba(86, 17, 120, 1) 88%,
+      rgba(135, 27, 190, 1) 100%
+    );
+    background: -webkit-linear-gradient(
+      159deg,
+      rgba(2, 0, 0, 1) 40%,
+      rgba(51, 10, 70, 1) 69%,
+      rgba(86, 17, 120, 1) 88%,
+      rgba(135, 27, 190, 1) 100%
+    );
+    background: linear-gradient(
+      159deg,
+      rgba(2, 0, 0, 1) 40%,
+      rgba(51, 10, 70, 1) 69%,
+      rgba(86, 17, 120, 1) 88%,
+      rgba(135, 27, 190, 1) 100%
+    );
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#020000",endColorstr="#871bbe",GradientType=1); */
+  
+  }
+
+  a:hover {
+    color: #24c8db;
+  }
+
+  input,
+  button {
+    color: #ffffff;
+    background-color: #0f0f0f98;
+  }
+  button:active {
+    background-color: #0f0f0f69;
+  }
+}
+/* ************************************************************ */
+
+.titlebar {
+  height: 30px;
+  background: #000000;
+  user-select: none;
+  display: flex;
+  justify-content: flex-end;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-radius: 5px 5px 0 0;
+  border-bottom: 1px solid #161616;
+  
+}
+.titlebar-button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 30px;
+  height: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.titlebar-button:hover {
+  background: #424242;
+}
+
+.titlebar-button img {
+  width: 12px;
+  height: 12px;
+  user-select: none;
+  -webkit-user-select: none;
+  filter: invert();
+}
