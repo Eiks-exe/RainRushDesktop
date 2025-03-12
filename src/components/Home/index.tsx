@@ -24,10 +24,11 @@ const Home: React.FC = () => {
 
   useEffect(() => {
     invoke("check_steam_path");
+    invoke("check_r2p_path")
+    invoke("check_bepinex_path")
      
     const unlisten = () => { listen<SteamPathChangedPayload>("steam_path_changed", (event) => {
       setGamePath(event.payload.steam_path);
-
     })};
     unlisten();
   }, []);
@@ -48,7 +49,7 @@ const Home: React.FC = () => {
       </div>
       <nav className={style.temp_nav}>
         <button
-          onClick={() => invoke("setup_environment")}
+          onClick={() => invoke("launch_r2")}
           className={style.btn}
         >
           launch ror2

@@ -4,7 +4,6 @@ mod utils;
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Listener, Manager, State};
-use tauri_plugin_dialog::DialogExt;
 
 #[derive(Default, Clone, Deserialize)]
 struct AppState {
@@ -39,6 +38,7 @@ fn get_steam_path(state: State<'_, Mutex<utils::UtilsState>>) -> String {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             let _window = app.get_webview_window("main").unwrap();
@@ -57,6 +57,8 @@ pub fn run() {
             utils::launch_r2,
             utils::set_steam_path,
             utils::check_steam_path,
+            utils::check_r2_path,
+            utils::check_bepinex_path,
             get_steam_path,
         ])
         .run(tauri::generate_context!())
