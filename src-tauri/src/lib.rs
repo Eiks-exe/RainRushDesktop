@@ -1,12 +1,14 @@
 mod utils;
+mod launch;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 use tauri::{AppHandle, Emitter, Listener, Manager, State};
+use utils::{index_dirs, setup_env};
 
 #[derive(Default, Clone, Deserialize)]
-struct AppState {
+pub struct AppState {
     auth_status: bool,
 }
 
@@ -29,12 +31,6 @@ fn toogle_auth(state: State<'_, Mutex<AppState>>, app: AppHandle) {
     .unwrap();
 }
 
-#[tauri::command]
-fn get_steam_path(state: State<'_, Mutex<utils::UtilsState>>) -> String {
-    let state = state.lock().unwrap();
-    state.steam_path.clone()
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -43,23 +39,20 @@ pub fn run() {
         .setup(|app| {
             let _window = app.get_webview_window("main").unwrap();
             app.manage(Mutex::new(AppState::default()));
+            app.manage(Mutex::new(launch::LauncherState::default()));
             app.manage(Mutex::new(utils::UtilsState::default()));
             app.listen("auth_status_changed", |event| {
                 if let Ok(payload) = serde_json::from_str::<AuthStatusChanged>(&event.payload()) {
                     println!("auth status changed: {}", payload.auth_status);
                 }
             });
-            Ok(())
+            let utils_state = app.state::<Mutex<utils::UtilsState>>();
+            index_dirs(app, &utils_state);
+            setup_env(app, &utils_state);
+            Ok(())  
         })
         .invoke_handler(tauri::generate_handler![
             toogle_auth,
-            utils::setup_environment,
-            utils::launch_r2,
-            utils::set_steam_path,
-            utils::check_steam_path,
-            utils::check_r2_path,
-            utils::check_bepinex_path,
-            get_steam_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

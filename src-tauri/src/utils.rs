@@ -1,14 +1,15 @@
-use serde::{Deserialize, Serialize};
+use std::fs;
+use std::path::Path;
 use std::sync::Mutex;
-use tauri::{AppHandle, Emitter, Manager, State};
-use tauri_plugin_dialog::DialogExt;
-use tauri_plugin_shell::ShellExt;
+use serde::{Deserialize, Serialize};
+use tauri::{App, Emitter, Manager, State};
 
 #[derive(Default, Clone, Deserialize, Serialize)]
 pub struct UtilsState {
+    pub app_data_dir: String,
+    pub dep_dir: String,
     pub steam_path: String,
     pub r2_path: String,
-    pub bepinex_path: String,
 }
 
 #[derive(Default, Clone, Deserialize, Serialize)]
@@ -23,21 +24,10 @@ pub struct R2PathChanged {
     r2_path: String,
 }
 
-fn absolute_path(path: &str) -> String {
-    std::path::Path::new(path).canonicalize().unwrap().to_str().unwrap().to_string()
-}
-
-#[tauri::command]
-pub fn check_steam_path(app: AppHandle, _state: State<'_, Mutex<UtilsState>>) {
+fn check_steam_path() -> String {
     // search automatically for steam path without user input
     // if found, set it as the steam path
     // if not found, prompt user to set it manually
-
-    let app_handle = app.clone();
-    let binding = app_handle.state::<Mutex<UtilsState>>();
-    let mut state = binding.lock().unwrap();
-
-    println!("Checking for steam path");
     let possible_paths = vec![
         "C:/Program Files (x86)/Steam/",
         "C:/Program Files/Steam/",
@@ -59,202 +49,137 @@ pub fn check_steam_path(app: AppHandle, _state: State<'_, Mutex<UtilsState>>) {
     }
 
     if let Some(path) = found_path {
-        state.steam_path = path.clone();
-        let data = &state.steam_path;
-        println!("Steam path found: {}", data);
-        app.emit(
-            "steam_path_changed",
-            SteamPathChanged {
-                located: true,
-                steam_path: data.to_string(),
-            },
-        )
-        .unwrap();
+        let data = path.to_string();
+        data
+        
     } else {
-        state.steam_path = "not found".to_string();
-        let data = &state.steam_path;
-        println!("Steam path not found");
-        app.emit(
-            "steam_path_changed",
-            SteamPathChanged {
-                located: false,
-                steam_path: data.to_string(),
-            },
-        )
-        .unwrap();
+        let data = "not found".to_string();
+        data
     }
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#[tauri::command]
-pub fn set_steam_path(app: AppHandle, _state: State<'_, Mutex<UtilsState>>) {
-    let app_handle = app.clone();
-    app.dialog()
-        .file()
-        .set_title("steam folder")
-        .set_directory("C:/")
-        .pick_folder(move |folder_path| {
-            let binding = app_handle.state::<Mutex<UtilsState>>();
-            let mut state = binding.lock().unwrap();
-            let folder_path = folder_path.unwrap();
-            println!(
-                "checking path: {}",
-                std::path::Path::new(&folder_path.to_string())
-                    .join("steam.exe")
-                    .display()
-            );
-            if !std::path::Path::new(&folder_path.to_string())
-                .join("steam.exe")
-                .exists()
-            {
-                println!("Invalid steam path");
-                app.emit(
-                    "steam_path_changed",
-                    SteamPathChanged {
-                        located: false,
-                        steam_path: "not found".to_string(),
-                    },
-                )
-                .unwrap();
-                return;
-            }
-
-            state.steam_path = folder_path.to_string();
-            let data = SteamPathChanged {
-                located: true,
-                steam_path: state.steam_path.clone(),
-            };
-            println!("steam path found: {}", data.steam_path);
-            app.emit(
-                "steam_path_changed",
-                SteamPathChanged {
-                    located: true,
-                    steam_path: state.steam_path.clone(),
-                },
-            )
-            .unwrap();
-        });
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#[tauri::command]
-pub fn check_r2_path(app: AppHandle) {
+pub fn check_r2_path(steam_dir_path: &String) -> String {
     // search automatically for r2 path without user input
     // if found, set it as the r2 path
     // if not found, prompt user to set it manually
-    let binding = app.state::<Mutex<UtilsState>>();
-    let mut state = binding.lock().unwrap();
-    let possible_path = state.steam_path.clone() + "/steamapps/common/Risk of Rain 2";
-
-    if std::path::Path::new(&possible_path).exists() {
-        state.r2_path = possible_path.clone();
-        app.emit(
-            "r2_path_changed",
-            R2PathChanged {
-                located: true,
-                r2_path: possible_path,
-            },
-        )
-        .unwrap();
+    let steam_dir = std::path::Path::new(&steam_dir_path);
+    let possible_path = steam_dir.join("steamapps/common/Risk of Rain 2/");
+    if steam_dir.exists() && possible_path.exists() {
+        let data = possible_path.clone().to_str().unwrap().to_string();
+        data
     } else {
         println!("Risk of Rain 2 not found");
-        state.r2_path = "not found".to_string();
-        app.emit(
-            "r2_path_changed",
-            R2PathChanged {
-                located: false,
-                r2_path: "not found".to_string(),
-            },
-        )
-        .unwrap();
+        let data = "not found".to_string();
+        data
     }
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#[tauri::command]
-pub fn check_bepinex_path(app: AppHandle) {
-    // search automatically for bepinex path without user input
-    // if found, set it as the bepinex path
-    // if not found, prompt user to set it manually
-    let binding = app.state::<Mutex<UtilsState>>();
-    let mut state = binding.lock().unwrap();
-    let possible_path = "./resources/dependencies/BepInExDep/BepInEx/";
-
-    if std::path::Path::new(&possible_path).exists() {
-        state.bepinex_path = possible_path.to_string();
-        println!("BepInEx found: {}", possible_path);
-    } else {
-        println!("BepInEx not found");
-        state.bepinex_path = "not found".to_string();
+pub fn index_dirs(app: &App, state: &State<'_, Mutex<UtilsState>>) {
+    let mut state = state.lock().unwrap();
+    
+    app.emit("index_dir", ()).unwrap();
+    let steam_dir = check_steam_path();
+    if steam_dir == "not found"{
+        app.emit("steam_path_changed", SteamPathChanged {
+            located: false,
+            steam_path: steam_dir.clone(),
+        }).unwrap();
     }
+    
+    let r2_dir = check_r2_path(&steam_dir);
+    
+    if r2_dir == "not found"{
+        app.emit("r2_path_changed", R2PathChanged {
+            located: false,
+            r2_path: r2_dir.clone(),
+        }).unwrap();
+    }
+
+    app.emit("steam_path_changed", SteamPathChanged {
+        located: true,
+        steam_path: steam_dir.clone(),
+    }).unwrap();
+    app.emit("r2_path_changed", R2PathChanged {
+        located: true,
+        r2_path: r2_dir.clone(),
+    }).unwrap();
+    
+    let app_data_dir = app.path().app_data_dir().unwrap();
+    let dep_dir = app
+        .path()
+        .resolve("dependencies/", tauri::path::BaseDirectory::Resource)
+        .unwrap();
+
+    if !dep_dir.exists() {
+        println!("Dependencies not found");
+    }
+
+    if !app_data_dir.exists() {
+        fs::create_dir_all(&app_data_dir).unwrap();
+    }
+    state.app_data_dir = app_data_dir.to_str().unwrap().to_string();
+    state.dep_dir = dep_dir.to_str().unwrap().to_string();
+    state.steam_path = steam_dir;
+    state.r2_path = r2_dir;
+    
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#[tauri::command]
-pub fn launch_r2(app: AppHandle, state: State<'_, Mutex<UtilsState>>) {
-    let state = state.lock().unwrap();
-    app.emit("launch_ror2", "launch_ror2 as been called")
-        .unwrap();
-
-    let steam_path = std::path::Path::new(&state.steam_path);
-    if !steam_path.exists() {
-        println!("Steam not found, please install it");
-    }
-    let r2_path = std::path::Path::new(&state.r2_path);
-    if !r2_path.exists() {
-        println!("Risk of Rain 2 not found, please install it");
-    }
-
-    let bepinex_path = std::path::Path::new(&state.bepinex_path);
-    if !bepinex_path.exists() {
-        println!("BepInEx not found, please install it");
-    }
-    let shell = app.shell();
-    let binding = bepinex_path.join("core/BepInEx.Preloader.dll");
-    let bep_preloader = binding.to_str().unwrap();
-    let absolute_bep_preloader = absolute_path(bep_preloader);
-    if !steam_path.exists() || !bepinex_path.join("core/BepInEx.Preloader.dll").exists() {
-        println!("configuration error...");
-        println!(
-            "Steam Path: {}, R2 Path: {}, BepInEx Path: {}",
-            steam_path.display(),
-            r2_path.display(),
-            bepinex_path.display()
-        );
-    } else {
-        println!(
-            "Steam Path: {}, R2 path: {}, BepInEx Path: {}",
-            steam_path.display(),
-            r2_path.display(),
-            bepinex_path.display(),
-        );
-        println!("Launching Risk of Rain 2... {}", absolute_bep_preloader);
-        tauri::async_runtime::block_on(async move {
-            shell
-                .command(steam_path.join("steam.exe"))
-                .args(["-applaunch", "632360" , "--doorstop-enable", "true", "--doorstop-target-assembly" , absolute_bep_preloader.as_str()])
-                .output()
-                .await
-                .unwrap()
-        });
-    }
-    app.emit("launch_ror2", "launch_ror2 has finished").unwrap();
+#[derive(Default, Clone, Deserialize, Serialize)]
+struct EnvSetup {
+    completed: bool,
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+pub fn setup_env(app: &App, state: &State<'_, Mutex<UtilsState>>) {
+    let mut _state = state.lock().unwrap();
+    let app_data_dir = app.path().app_data_dir().unwrap();
+    let dep_dir = app
+        .path()
+        .resolve("dependencies", tauri::path::BaseDirectory::Resource)
+        .unwrap();
 
-#[tauri::command]
-pub fn setup_environment(app: tauri::AppHandle) {
-    app.emit("setup_environment", "setup_environment as been called")
-        .unwrap();
-    let bepinex_path = std::path::Path::new("resources/dependencies/BepInExDep/BepInEx");
-    if !bepinex_path.exists() {
-        println!("BepInEx not found, extracting...");
+    if !dep_dir.exists() {
+        println!("Dependencies not found");
     }
-    app.emit("setup_environment", "setup_environment has finished")
-        .unwrap();
+
+    if !app_data_dir.exists() {
+        fs::create_dir_all(&app_data_dir).unwrap();
+    }
+    println!("Copying dependencies to app data dir {} {}", dep_dir.display(), app_data_dir.display());
+    
+
+    match copy_dir_recursive(&dep_dir, &app_data_dir){
+        Ok(_) => {
+            println!("Dependencies copied successfully");
+            app.emit("env_setup", EnvSetup { completed: true }).unwrap();
+        }
+        Err(e) => {
+            println!("Error copying dependencies: {}", e);
+        }
+    }
+} 
+    
+
+
+
+fn copy_dir_recursive(src: &Path, dest: &Path) -> std::io::Result<()> {
+    // Create the destination directory if it doesn't exist
+    if !dest.exists() {
+        fs::create_dir_all(dest)?;
+    }
+
+    // Iterate over the entries in the source directory
+    for entry in fs::read_dir(src)? {
+        let entry = entry?;
+        let entry_path = entry.path();
+        let dest_path = dest.join(entry.file_name());
+
+        // If it's a directory, recurse, otherwise copy the file
+        if entry_path.is_dir() {
+            copy_dir_recursive(&entry_path, &dest_path)?;
+        } else {
+            fs::copy(&entry_path, &dest_path)?;
+        }
+    }
+
+    Ok(())
 }
