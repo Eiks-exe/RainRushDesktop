@@ -18,13 +18,14 @@ function App() {
 
     const downloadEventListener = listen('setup_environment', (event) => {
       console.log(event.payload);
-    }
-    );
+    });
 
+   
     return () => {
       unlisten.then((f) => f());
       downloadEventListener.then((f
       ) => f());
+     
     }; 
   }, [loggedIn]);
    
