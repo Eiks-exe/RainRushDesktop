@@ -1,40 +1,43 @@
-import Home from "./components/Home";
-import Auth from "./components/Authentification";
-import React from "react";
-import { listen } from '@tauri-apps/api/event';
 import "./App.css";
-
-interface AuthStatusChanged {
-  authStatus: boolean;
-}
+import React from "react";
+import AppLayout from "./components/AppLayout/AppLayout";
+import { useAppContext } from "./contexts/AppContext";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Settings from "./pages/Settings";
+import { useAuth } from "./contexts/AuthContext";
+import DashboardComponent from "./components/DashboardComponent/DashboardComponent";
 
 function App() {
-  const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
+  const { view, setView } = useAppContext();
+  const { state } = useAuth();
   React.useEffect(() => {
-    console.log(`logged in: ${loggedIn}`);
-    const unlisten = listen<AuthStatusChanged>('auth_status_changed', (event) => {
-      setLoggedIn(event.payload.authStatus);
-    });
-
-    const downloadEventListener = listen('setup_environment', (event) => {
-      console.log(event.payload);
-    });
-
-   
-    return () => {
-      unlisten.then((f) => f());
-      downloadEventListener.then((f
-      ) => f());
-     
-    }; 
-  }, [loggedIn]);
-   
-  
+    console .log('isAuthenticated', state.isAuthenticated);
+    if (state.isAuthenticated) {
+      setView('home');
+    } else {
+      setView('login');
+    }
+  }, [state.isAuthenticated, setView]);
   return (
-    <>
-      {loggedIn  ? <Home/> : <Auth.Login/>}
-    </>
-  );
+    <AppLayout>
+      {
+        !state.isAuthenticated ? (
+          <>
+            {view === 'login' && <Login />}
+            {view === 'register' && <Register />}
+          </>   
+        ) : (
+          <>
+            {view === 'home' && <Home />}
+            {view === 'settings' && <Settings/>}
+            {view === 'profile' && <h1>Profile</h1>}
+          </>
+        )
+      }
+    </AppLayout>
+  );  
 }
 
 export default App;
