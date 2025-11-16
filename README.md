@@ -23,7 +23,7 @@ This project is currently in **paused development**, but the foundation is compl
 
 ## 🏗️ Stack
 
-- **Frontend**: Tauri + Vanilla JS/HTML/CSS
+- **Frontend**: Tauri + React
 - **Backend**: Node.js (Express API)
 - **Database**: MySQL
 - **Game Integration**: Custom mod hooks into RoR2 runtime
