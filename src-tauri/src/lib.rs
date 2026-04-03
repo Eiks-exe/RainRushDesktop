@@ -33,9 +33,11 @@ fn toogle_auth(state: State<'_, Mutex<AppState>>, app: AppHandle) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_websocket::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
             let _window = app.get_webview_window("main").unwrap();
             app.manage(Mutex::new(AppState::default()));
@@ -51,7 +53,7 @@ pub fn run() {
                 r2_path: Default::default(),
                 bepinex_path: Default::default(),
                 dep_dir: Default::default(),
-                token: Default::default(), 
+                token: Default::default(),
             }));
             app.listen("auth_status_changed", |event| {
                 if let Ok(payload) = serde_json::from_str::<AuthStatusChanged>(event.payload()) {

@@ -1,12 +1,15 @@
 import React from "react";
-import style from "./home.module.css"
+import styles from "./home.module.css";
 import { useAuth } from "../contexts/AuthContext";
 import { useEffect } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { fetchUserRuns } from "../utils/fetchData";
 import { IRun } from "../interfaces/Irun";
-import {secondsToHms, formatResult, formatSurvivor} from "../utils/utils";
+import { secondsToHms, formatResult, formatSurvivor } from "../utils/utils";
+import { AppHeader } from "../components/AppHeader";
+import HomeLayout from "../components/HomeLayout/HomeLayout";
+
 const Home = () => {
   const { state } = useAuth();
   const { user } = state;
@@ -22,7 +25,7 @@ const Home = () => {
       return;
     }
     const fetchHistory = async () => {
-      setLoading(true); 
+      setLoading(true);
       const data = await fetchUserRuns(user.id);
       if (data && data.runs) {
         setHistory(data.runs);
@@ -33,31 +36,41 @@ const Home = () => {
     fetchHistory();
   }, []);
   return (
-  <div className={style.home_wrapper}>
-    <div className={style.home_container}>
-      <div className={style.home_header}>
-        <div className={style.header_title}>Hey, {user?.name} rain's falling...</div>
-        <button className={style.start_button} onClick={()=>{invoke("launch_r2")}}>Start</button>
-      </div>
-      <div className={style.history_card}>
-        {loading ? <div className={style.loading}>Loading...</div> : (
-          <ul className={style.history_list}>
-            {history.map((run: any, index: number) => (
-              <li key={index} className={formatResult(run.result) === "Win" ? style.runWon : style.runLost}>
-                <span><img src= {`../assets/difficulty/${run.difficulty}.png`}/></span>
-                <span><img src= {`../assets/survivors/${formatSurvivor(run.survivor)}.png`} width="50px"/></span>
-                <span>{formatResult(run.result)} </span>
-                <span>{secondsToHms(run.duration)} </span>
-              </li>
-             ))}
-          </ul>
-        )}
-      </div>
-    </div>
-  </div> 
- )
-}
+    <>
+      {user ? (
+        <HomeLayout user={user}>
+          <div className={styles.history_container}>
+            <h4>History</h4>
+            <div className={styles.history_content}>
+              {history.map((run: IRun) => (
+                <div
+                  className={
+                    formatResult(run.result) === "Win"
+                      ? styles.runWon
+                      : styles.runLost
+                  }
+                >
+                  <img
+                    src={`../assets/survivors/${formatSurvivor(run.survivor)}.png`}
+                    alt={formatSurvivor(run.survivor).toString()}
+                  />
+                  <div className={styles.items_wrapper}>
+                    {run.items &&
+                      Object.keys(run.items).map((item) => (
+                        <img src={`assets/items/${item}.png`} />
+                      ))}
+                  </div>
+                  <img src={`/assets/difficulty/${run.difficulty}.png`} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </HomeLayout>
+      ) : (
+        <span>error</span>
+      )}
+    </>
+  );
+};
 
 export default Home;
-
-

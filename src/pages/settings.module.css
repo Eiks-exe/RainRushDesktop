@@ -1,11 +1,11 @@
 .wrapper {
   display: flex;
-  margin: 35px 0; 
+  margin: 70px 0; 
   flex-direction: column;
   align-items: center;
   justify-content: start;
-  height: 100%;
-  width: 100%;
+  height: 96%;
+  width: 75vw;
 }
 
 .settings_container {
@@ -20,12 +20,40 @@
 .settings_item {
   display: flex;
   flex-direction: column;
+  justify-content: center;
   width: 100%;
   height: 10% ;
-  background: #aaa;
+  background: #000;
   font-size: 1.2rem;
+  border-bottom: #fff solid 1px;
+  
 }
+
+
 
 settings_text {
   text-align: center;
+}
+.categories{
+  width: 100%;
+  display: flex;
+}
+.category {
+  font-size: 1.2rem;
+  cursor: pointer;
+  background: #111;
+  border: white solid 1px;
+  border-left: none;
+  padding: 0 0.5rem 0 0.5rem ;
+  border-radius: 0 0.2rem 0 0;
+}
+
+.fcsCategory{
+  background: #000;
+  border-bottom: none;
+}
+
+.filler {
+  border-bottom: white solid 1px;
+  flex-grow: 1;
 }

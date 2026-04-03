@@ -51,6 +51,8 @@ const formatSurvivor = (survivor: string | undefined): string => {
       return "Artificer";
     case "Captain":
       return "Captain";
+    case "VoidSurvivor":
+      return "VoidFiend";
     default:
       return formattedSurvivor;
   }

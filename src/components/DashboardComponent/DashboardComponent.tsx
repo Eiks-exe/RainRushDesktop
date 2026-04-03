@@ -6,8 +6,8 @@ import { useAppContext } from "../../contexts/AppContext";
 
 const DashboardComponent: react.FC = () => {
   const { state } = useAuth();
-  const { setView } = useAppContext();
-
+  const { view, setView } = useAppContext();
+  const views = ["profile", "home", "settings"]
   useEffect(() => {
     console.log('isAuthenticated', state.isAuthenticated, state.user);
   }, [state.isAuthenticated, state.user]);
@@ -19,9 +19,9 @@ const DashboardComponent: react.FC = () => {
         </div>
         <div className={style.dashboard_nav}>
           <ul>
-            <li onClick={() => setView('home')}>Home</li>
-            <li onClick={() => setView('settings')}>Settings</li>
-            <li onClick={() => setView('profile')}>Profile</li>
+            {views.map((v)=>(
+              <li className={view === v ? style.active : "" } onClick={()=>{setView(v)}}>{v}</li>
+            ))}
           </ul>
         </div>
       </div>

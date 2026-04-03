@@ -18,6 +18,7 @@
     "core:app:allow-tauri-version",
     "dialog:default",
     "shell:default",
-    "websocket:default"
+    "websocket:default",
+    "store:default"
   ]
 }

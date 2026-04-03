@@ -18,7 +18,8 @@ pub fn launch_r2(app: AppHandle, state: State<'_, Mutex<utils::UtilsState>>) {
     let steam_path = binding.steam_path.as_str();
     let r2_path = binding.r2_path.as_str();
     let bep_loader_path = binding.bepinex_path.as_str();
-    let app_data_dir_path = std::path::Path::new(&binding.app_data_dir).join("BepInExDep/BepInEx/config/token.txt");
+    let app_data_dir_path =
+        std::path::Path::new(&binding.app_data_dir).join("BepInExDep/BepInEx/config/token.txt");
     std::fs::write(app_data_dir_path, binding.token.as_str()).unwrap();
     println!("steam path launch fn: {}", steam_path);
     println!("risk of rain 2 path launch fn: {}", r2_path);

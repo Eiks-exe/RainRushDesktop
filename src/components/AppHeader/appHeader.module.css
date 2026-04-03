@@ -1,0 +1,35 @@
+.AppHeader {
+  background: #000;
+  height: 130px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 99.1%;
+  padding: 0;
+}
+
+.AppHeader::after {
+  content: " " ;
+  position: absolute;
+  min-height: 100px;
+  width: 74.9vw; 
+  z-index: -5;
+  transform: translateX(-3px);
+  background: linear-gradient(
+    90deg, rgba(0,0,0,0) 50%, #fff, rgba(0,0,0,0)
+  );
+  background-origin: border-box;
+  background-clip: padding-box, border-box, border-box;
+  background-size: 200%;
+  animation: animate 5s linear infinite;
+}
+
+.AppHeader, .AppHeader::after {
+  border-radius: 25px;
+}
+
+@keyframes animate {
+  to {
+    background-position: 200%;
+  }
+}

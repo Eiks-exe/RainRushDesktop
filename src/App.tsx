@@ -7,7 +7,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Settings from "./pages/Settings";
 import { useAuth } from "./contexts/AuthContext";
-import DashboardComponent from "./components/DashboardComponent/DashboardComponent";
+import { Profile } from "./pages/Profile";
 
 function App() {
   const { view, setView } = useAppContext();
@@ -32,7 +32,7 @@ function App() {
           <>
             {view === 'home' && <Home />}
             {view === 'settings' && <Settings/>}
-            {view === 'profile' && <h1>Profile</h1>}
+            {view === 'profile' && <Profile/>}
           </>
         )
       }
